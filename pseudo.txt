@@ -1,0 +1,21 @@
+DO temperature = 1,2,3,...
+  DO time = 1,2,3,4,5,6,7,8,9,10,11,12,13,...
+    IF mod(time,10) == 0
+      CALCULATE average of M using t0=time-9 and t=time
+    ELSE
+      DO elements of state matrix (Sij)
+        change spins etc...
+        ...
+        ...
+      END DO
+    END IF
+  END DO
+END DO
+
+
+End time loop when <M> is found (When M vs time step flattens)
+
+Find M(T) by plotting <M> against temperature
+
+SKIPPING TIME STEPS AT TIME=10,20,30,...
+THEREFORE STILL NEED TO CHANGE SPINS AT THESE TIME STEPS
