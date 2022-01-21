@@ -1,0 +1,17 @@
+############################
+### INTRO FOR ELOG ENTRY ###
+############################
+
+(Need to include equations)
+
+
+For this experiment, a Monte-Carlo algorithm will be used to change the dipoles ('spin') in an Ising Model (can take dicrete 
+values of +1 or -1). In the Monte-Carlo algorithm the spin of a randomly selected value, Si, will be changed, creating a 'new'
+and an 'old' state. The energy of each state will then be calculated using the spins of the selected dipole, Si, and its 
+neighbours, Sj. The energy change between these two different states will then be calculated. If this energy change is 
+less than 0, then the spin will remain in the new state i.e. Si is the opposite of what it was originally. If the Energy 
+is greater than zero, a random number, r, will be selected between 0 and 1, and if r is less than exp(-deltaE/kT) then the 
+spin will remain at its new value, else it will be returned to its original value. This process will be repeated across all 
+
+
+This algorithm will then be looped over a number of steps, taking the average of the magnetisation 
