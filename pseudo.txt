@@ -1,21 +1,25 @@
-DO temperature = 1,2,3,...
-  DO time = 1,2,3,4,5,6,7,8,9,10,11,12,13,...
+DO temperature values (e.g. 1,2,3,..).
+  DO time steps (e.g. 1,2,3,4,5,6,7,8,9,10,11,12,13,..).
     IF mod(time,10) == 0
       CALCULATE average of M using t0=time-9 and t=time
+      ASSIGN M value to element of M array
+      CALCULATE average of E using t0=time-9 and t=time
+      ASSIGN E value to element of E array
+      CALCULATE M**2
+      ASSIGN value of M**2 to element of M**2 array
+      CALCULATE E**2
+      ASSIGN value of E**2 to element of E**2 array
+      DO i = width of grid
+        DO j = height of grid
+          ALGORITHM to change spins
+        END DO
+      END DO
     ELSE
-      DO elements of state matrix (Sij)
-        change spins etc...
-        ...
-        ...
+      DO i = width of grid
+        DO j = height of grid
+          ALGORITHM to change spins
+        END DO
       END DO
     END IF
   END DO
 END DO
-
-
-End time loop when <M> is found (When M vs time step flattens)
-
-Find M(T) by plotting <M> against temperature
-
-SKIPPING TIME STEPS AT TIME=10,20,30,...
-THEREFORE STILL NEED TO CHANGE SPINS AT THESE TIME STEPS
