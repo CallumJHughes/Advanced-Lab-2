@@ -1,0 +1,11 @@
+DO d = 0, width of probability array (0 to 4) where d is number of down spins
+  IF current lattice point Si has spin up
+    COMPUTE change in energy with d number of down spins
+    COMPUTE probability of change in spin
+    ASSIGN probability to dth element in first row of array
+  ELIF current lattice point Si has spin down
+    COMPUTE change in energy with d number of down spins
+    COMPUTE probability of change in spin
+    ASSIGN probability to dth element in second row of array
+  END IF
+END DO
