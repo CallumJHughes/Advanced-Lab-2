@@ -1,6 +1,7 @@
 program ising
   implicit none
   integer, parameter :: dp=selected_real_kind(15,300)
+
 !********************************************************************
 !************************* DEFINING OBJECTS *************************
 !********************************************************************
@@ -10,11 +11,12 @@ program ising
 
   !!! Defines arrays !!!
   real (kind=dp), dimension(0:4,2) :: probArray
-  real (kind=dp), dimension(:,:), allocatable :: isingGrid
+  integer, dimension(:,:), allocatable :: isingGrid
 
   !!! Defines variables
   real (kind=dp) :: temp
   integer :: isingWidth, isingHeight, i, j, spinSi
+  integer :: neighbour1, neighbour2, neighbour3, neighbour4, neighbourSum
 
   !!! Deines the functions names and types !!!
   real (kind=dp) :: Probability, Energy
@@ -23,17 +25,20 @@ program ising
 !************************** MAIN PROGRAMME **************************
 !********************************************************************
 
-  isingWidth = 3
-  isingHeight = 3
-  allocate(isingGrid(isingWidth,IsingHeight))
+  call CreateIsingGrid
+  isingGrid(2,1) = -1
+  isingGrid(1,2) = -1
+  print *, isingGrid
 
-  do i = 1, isingWidth
-    do j = 1, isingHeight
-      call CreateIsingGrid
-      isingGrid(3,3) = -1
+  do j = 1, isingHeight
+    do i = 1, isingWidth
       call CheckSpin
+      print *, 'Current spin is: ' ,spinSi
+      call SumNeighbourSpin
     end do
   end do
+
+  print *, isingGrid
 
 !********************************************************************
 !******************** FUNCTIONS AND SUBROUTINES *********************
@@ -51,7 +56,15 @@ contains
 
   subroutine CreateIsingGrid
     !!! Subroutine to create the Ising Grid system of lattice points, each with a magnetic spin of 1 !!!
-    isingGrid(i,j) = 1
+    isingWidth = 6
+    isingHeight = 6
+    allocate(isingGrid(isingWidth,isingHeight))
+
+    do j = 1, isingHeight
+      do i = 1, isingWidth
+        isingGrid(i,j) = 1
+      end do
+    end do
   end subroutine
 
   subroutine CheckSpin
@@ -63,8 +76,41 @@ contains
     else
       print *, 'ERROR: magnetic spin at position', i, j, 'is not equal to 1 or -1'
     end if
+  end subroutine
 
-    print *, spinSi
+  subroutine SumNeighbourSpin
+    !!! Subroutine to sum the magnetic spins of the neighbouring lattice points
+    neighbourSum = 0
+
+    if ((j-1).LT.1) then
+      neighbour1 = isingGrid(i,isingHeight)
+    else
+      neighbour1 = isingGrid(i,j-1)
+    end if
+
+    if ((i+1).GT.isingWidth) then
+      neighbour2 = isingGrid(1,j)
+    else
+      neighbour2 = isingGrid(i+1,j)
+    end if
+
+    if ((j+1).GT.isingHeight) then
+      neighbour3 = isingGrid(i,1)
+    else
+      neighbour3 = isingGrid(i,j+1)
+    end if
+
+    if ((i-1).LT.1) then
+      neighbour4 = isingGrid(isingWidth,j)
+    else
+      neighbour4 = isingGrid(i-1,j)
+    end if
+
+    print *, neighbour1, neighbour2, neighbour3, neighbour4
+
+    neighbourSum = neighbour1 + neighbour2 + neighbour3 + neighbour4
+
+    print *, neighbourSum
   end subroutine
 
   !subroutine PreCalcProbs
