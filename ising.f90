@@ -15,7 +15,7 @@ program ising
 
   !!! Defines variables
   real (kind=dp) :: temp
-  integer :: isingWidth, isingHeight, i, j, spinSi
+  integer :: isingWidth, isingHeight, i, j, spinSi, downSpins
   integer :: neighbour1, neighbour2, neighbour3, neighbour4, neighbourSum
 
   !!! Deines the functions names and types !!!
@@ -28,6 +28,8 @@ program ising
   call CreateIsingGrid
   isingGrid(2,1) = -1
   isingGrid(1,2) = -1
+  isingGrid(3,2) = -1
+  isingGrid(2,3) = -1
   print *, isingGrid
 
   do j = 1, isingHeight
@@ -35,10 +37,9 @@ program ising
       call CheckSpin
       print *, 'Current spin is: ' ,spinSi
       call SumNeighbourSpin
+      call CheckDownSpins
     end do
   end do
-
-  print *, isingGrid
 
 !********************************************************************
 !******************** FUNCTIONS AND SUBROUTINES *********************
@@ -56,8 +57,8 @@ contains
 
   subroutine CreateIsingGrid
     !!! Subroutine to create the Ising Grid system of lattice points, each with a magnetic spin of 1 !!!
-    isingWidth = 6
-    isingHeight = 6
+    isingWidth = 3
+    isingHeight = 3
     allocate(isingGrid(isingWidth,isingHeight))
 
     do j = 1, isingHeight
@@ -79,7 +80,7 @@ contains
   end subroutine
 
   subroutine SumNeighbourSpin
-    !!! Subroutine to sum the magnetic spins of the neighbouring lattice points
+    !!! Subroutine to sum the magnetic spins of the neighbouring lattice points !!!
     neighbourSum = 0
 
     if ((j-1).LT.1) then
@@ -113,6 +114,23 @@ contains
     print *, neighbourSum
   end subroutine
 
+  subroutine CheckDownSpins
+    !!! Subroutine to check the number of down spins in the set of neighbours !!!
+    if (neighbourSum.EQ.4) then
+      downSpins = 0
+    else if (neighbourSum.EQ.2) then
+      downSpins = 1
+    else if (neighbourSum.EQ.0) then
+      downSpins = 2
+    else if (neighbourSum.EQ.-2) then
+      downSpins = 3
+    else if (neighbourSum.EQ.-4) then
+      downSpins = 4
+    end if
+
+    print *, downSpins
+  end subroutine
+
   !subroutine PreCalcProbs
     !!! Subroutine to precalculate the probabilities of flipping spin !!!
    ! integer :: d
@@ -131,3 +149,4 @@ end program ising
 !!! NOTES !!!
 !!!!!!!!!!!!!
 ! – Maybe move allocation of isingGrid to subroutine CreateIsingGrid (call CreateIsingGrid be removed from nested loop in main programme)
+! - Remember to remove all print statements in each subroutine used for testing
