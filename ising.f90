@@ -19,11 +19,13 @@ program ising
   integer :: neighbour1, neighbour2, neighbour3, neighbour4, neighbourSum
 
   !!! Deines the functions names and types !!!
-  real (kind=dp) :: Probability, Energy
+  !real (kind=dp) :: Probability, Energy
 
 !********************************************************************
 !************************** MAIN PROGRAMME **************************
 !********************************************************************
+
+  temp = 3
 
   call CreateIsingGrid
   isingGrid(2,1) = -1
@@ -38,6 +40,10 @@ program ising
       print *, 'Current spin is: ' ,spinSi
       call SumNeighbourSpin
       call CheckDownSpins
+      print *, 'energy is: ', Energy(spinSi)
+      print *, 'probability is: ', Probability(spinSi)
+      call PreCalcProbs
+      print *, ' '
     end do
   end do
 
@@ -45,15 +51,23 @@ program ising
 !******************** FUNCTIONS AND SUBROUTINES *********************
 !********************************************************************
 contains
-  !function Energy()
+  function Energy(Si)
     !!! Function to calculate Energy of state at current lattice point !!!
-    !Energy = -Si*sum(Sj)-hSi
-  !end function
+    real(kind=dp) :: Energy
+    integer :: Si
+    real(kind=dp), parameter :: J = 1
+    real(kind=dp), parameter :: h = 0.01
 
-  !function Probability()
+    Energy = -(Si*neighbourSum)-(h*Si)
+  end function Energy
+
+  function Probability(Si)
     !!! Function to calculate probability of spin flip using Energy function !!!
-    !Probability = exp(-(Energy(new)-Energy(old))/(kB*temp))
-  !end function
+    real(kind=dp) :: Probability
+    integer :: Si
+
+    Probability = exp(-(Energy(Si)-Energy(Si*(-1)))/temp)
+  end function
 
   subroutine CreateIsingGrid
     !!! Subroutine to create the Ising Grid system of lattice points, each with a magnetic spin of 1 !!!
@@ -107,11 +121,11 @@ contains
       neighbour4 = isingGrid(i-1,j)
     end if
 
-    print *, neighbour1, neighbour2, neighbour3, neighbour4
+    print *, 'neighbour spins are: ' , neighbour1, neighbour2, neighbour3, neighbour4
 
     neighbourSum = neighbour1 + neighbour2 + neighbour3 + neighbour4
 
-    print *, neighbourSum
+    print *,'neighbour sum is: ' , neighbourSum
   end subroutine
 
   subroutine CheckDownSpins
@@ -128,21 +142,23 @@ contains
       downSpins = 4
     end if
 
-    print *, downSpins
+    print *, 'number of down spins is: ', downSpins
   end subroutine
 
-  !subroutine PreCalcProbs
+  subroutine PreCalcProbs
     !!! Subroutine to precalculate the probabilities of flipping spin !!!
-   ! integer :: d
+    integer :: d
 
-  !  do d = 0, 4
-  !    if (spinSi == 1) then
-  !      probArray(d,1) = Probability()
-  !    else if (spinSi == -1) then
- !       probArray(d,2) = Probability()
-     ! end if
-    !end do
-  !end subroutine
+    do d = 0, 4
+      if (spinSi == 1) then
+        probArray(d,1) = Probability(spinSi)
+      else if (spinSi == -1) then
+        probArray(d,2) = Probability(spinSi)
+      end if
+    end do
+
+    print *, probArray
+  end subroutine
 end program ising
 
 !!!!!!!!!!!!!
@@ -150,3 +166,5 @@ end program ising
 !!!!!!!!!!!!!
 ! – Maybe move allocation of isingGrid to subroutine CreateIsingGrid (call CreateIsingGrid be removed from nested loop in main programme)
 ! - Remember to remove all print statements in each subroutine used for testing
+! – IOSTAT=err for input and what not
+! – Will kB be used in Probability function?
