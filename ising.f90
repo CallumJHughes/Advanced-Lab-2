@@ -27,6 +27,14 @@ program ising
 
   temp = 3
 
+  spinSi = 1
+  call PreCalcProbs
+  spinSi = -1
+  call PreCalcProbs
+
+  print *, probArray
+
+
   call CreateIsingGrid
   isingGrid(2,1) = -1
   isingGrid(1,2) = -1
@@ -34,18 +42,18 @@ program ising
   isingGrid(2,3) = -1
   print *, isingGrid
 
-  do j = 1, isingHeight
-    do i = 1, isingWidth
-      call CheckSpin
-      print *, 'Current spin is: ' ,spinSi
-      call SumNeighbourSpin
-      call CheckDownSpins
-      print *, 'energy is: ', Energy(spinSi)
-      print *, 'probability is: ', Probability(spinSi)
-      call PreCalcProbs
-      print *, ' '
-    end do
-  end do
+  !do j = 1, isingHeight
+    !do i = 1, isingWidth
+      !call CheckSpin
+      !print *, 'Current spin is: ' ,spinSi
+      !call SumNeighbourSpin
+      !call CheckDownSpins
+      !print *, 'energy is: ', Energy(spinSi)
+      !print *, 'probability is: ', Probability(spinSi)
+      !call PreCalcProbs
+      !print *, ' '
+    !end do
+  !xend do
 
 !********************************************************************
 !******************** FUNCTIONS AND SUBROUTINES *********************
@@ -66,7 +74,7 @@ contains
     real(kind=dp) :: Probability
     integer :: Si
 
-    Probability = exp(-(Energy(Si)-Energy(Si*(-1)))/temp)
+    Probability = exp(-(Energy(Si*(-1))-Energy(Si))/temp)
   end function
 
   subroutine CreateIsingGrid
@@ -142,24 +150,25 @@ contains
       neighboursum = -4
     end if
 
-    print *, 'number of down spins is: ', downSpins
+    !print *, 'number of down spins is: ', downSpins
   end subroutine
 
   subroutine PreCalcProbs
     !!! Subroutine to precalculate the probabilities of flipping spin !!!
-    integer :: d
+    !integer :: d
 
     do downSpins = 0, 4
       if (spinSi == 1) then
         call CheckDownSpins
         probArray(downSpins,1) = Probability(spinSi)
+        print *, neighbourSum
       else if (spinSi == -1) then
         call CheckDownSpins
-        probArray(d,2) = Probability(spinSi)
+        probArray(downSpins,2) = Probability(spinSi)
+        print *, neighbourSum
       end if
     end do
 
-    print *, probArray
   end subroutine
 end program ising
 
@@ -171,5 +180,4 @@ end program ising
 ! - Remember to remove all print statements in each subroutine used for testing
 ! – IOSTAT=err for input and what not
 ! – Will kB be used in Probability function?
-! – It seems that the probability is very low when neighbour spins are all down and current spin is up. When current spin
-!   is down, probability does not change no matter what the neighbours are
+! – When all neighbour flips are up, the probability of changing to flip down is very high
