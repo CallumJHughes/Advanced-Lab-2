@@ -164,7 +164,10 @@ end program ising
 !!!!!!!!!!!!!
 !!! NOTES !!!
 !!!!!!!!!!!!!
-! – Maybe move allocation of isingGrid to subroutine CreateIsingGrid (call CreateIsingGrid be removed from nested loop in main programme)
+! – Maybe move allocation of isingGrid to subroutine CreateIsingGrid (call CreateIsingGrid be removed from nested loop in
+!   main programme)
 ! - Remember to remove all print statements in each subroutine used for testing
 ! – IOSTAT=err for input and what not
 ! – Will kB be used in Probability function?
+! – It seems that the probability is very low when neighbour spins are all down and current spin is up. When current spin
+!   is down, probability does not change no matter what the neighbours are
