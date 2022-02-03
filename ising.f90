@@ -130,16 +130,16 @@ contains
 
   subroutine CheckDownSpins
     !!! Subroutine to check the number of down spins in the set of neighbours !!!
-    if (neighbourSum.EQ.4) then
-      downSpins = 0
-    else if (neighbourSum.EQ.2) then
-      downSpins = 1
-    else if (neighbourSum.EQ.0) then
-      downSpins = 2
-    else if (neighbourSum.EQ.-2) then
-      downSpins = 3
-    else if (neighbourSum.EQ.-4) then
-      downSpins = 4
+    if (downSpins.EQ.0) then
+      neighbourSum = 4
+    else if (downSpins.EQ.1) then
+      neighbourSum = 2
+    else if (downSpins.EQ.2) then
+      neighbourSum = 0
+    else if (downSpins.EQ.3) then
+      neighbourSum = -2
+    else if (downSpins.EQ.4) then
+      neighboursum = -4
     end if
 
     print *, 'number of down spins is: ', downSpins
