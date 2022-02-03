@@ -149,10 +149,12 @@ contains
     !!! Subroutine to precalculate the probabilities of flipping spin !!!
     integer :: d
 
-    do d = 0, 4
+    do downSpins = 0, 4
       if (spinSi == 1) then
-        probArray(d,1) = Probability(spinSi)
+        call CheckDownSpins
+        probArray(downSpins,1) = Probability(spinSi)
       else if (spinSi == -1) then
+        call CheckDownSpins
         probArray(d,2) = Probability(spinSi)
       end if
     end do
