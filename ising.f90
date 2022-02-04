@@ -15,8 +15,8 @@ program ising
   real (kind=dp), dimension(:), allocatable :: magData
 
   !!! Defines variables
-  real (kind=dp) :: temp, probValue
-  integer :: isingWidth, isingHeight, i, j, timestep, spinSi, downSpins, numTimeSteps
+  real (kind=dp) ::  probValue
+  integer :: isingWidth, isingHeight, i, j, timestep, spinSi, downSpins, numTimeSteps, temp
   integer :: neighbour1, neighbour2, neighbour3, neighbour4, neighbourSum, sumSi
   logical :: flipAllowed
 
@@ -24,9 +24,9 @@ program ising
 !************************** MAIN PROGRAMME **************************
 !********************************************************************
 
-  numTimeSteps = 20
+  numTimeSteps = 500
   allocate(magData(numTimeSteps))
-  temp = 10
+  temp = 3
 
   ! Precalculate the probability array
   spinSi = 1
@@ -34,12 +34,11 @@ program ising
   spinSi = -1
   call PreCalcProbs
 
-  !print *, probArray
-
   call CreateIsingGrid
-  isingGrid(1,1) = -1
-  isingGrid(2,1) = -1
-  isingGrid(3,1) = -1
+  !isingGrid(3,4) = -1
+  !isingGrid(1,5) = -1
+  !isingGrid(5,3) = -1
+  !isingGrid(3,4) = -1
   print *, isingGrid
 
   do timestep = 1, numTimeSteps
@@ -53,33 +52,38 @@ program ising
         call FlipSpin
         call UpdateIsingGrid
         call SumLatticeSpins
-        print *, ' ' ! Creates gap between output statements for each step
+        !print *, ' ' ! Creates gap between output statements for each step
       end do
     end do
     call AssignMagData
   end do
 
-  print *, magData
+  print *, isingGrid
+
+  !print *, magData
+
+  print *, probArray
 
 !********************************************************************
 !******************** FUNCTIONS AND SUBROUTINES *********************
 !********************************************************************
 contains
-  function Energy(Si)
+  function Energy(Si,neighbours)
     !!! Function to calculate Energy of state at current lattice point !!!
     real (kind=dp) :: Energy
-    integer :: Si
-    real (kind=dp), parameter :: h = 0.01
+    integer :: Si, neighbours
+    real (kind=dp), parameter :: J = 1.0
+    real (kind=dp), parameter :: h = 0.0
 
-    Energy = -(Si*neighbourSum)-(h*Si)
+    Energy = -(J*Si*neighbours)-(h*Si)
   end function Energy
 
-  function Probability(Si)
+  function Probability(Si,neighbours,temp)
     !!! Function to calculate probability of spin flip using Energy function !!!
     real (kind=dp) :: Probability
-    integer :: Si
+    integer :: Si, neighbours, temp
 
-    Probability = exp(-(Energy(Si*(-1))-Energy(Si))/temp)
+    Probability = exp(-(Energy(Si*(-1),neighbours)-Energy(Si,neighbours))/temp)
   end function
 
   function Magnetisation(sumSi)
@@ -92,8 +96,8 @@ contains
 
   subroutine CreateIsingGrid
     !!! Subroutine to create the Ising Grid system of lattice points, each with a magnetic spin of 1 !!!
-    isingWidth = 3
-    isingHeight = 3
+    isingWidth = 6
+    isingHeight = 6
     allocate(isingGrid(isingWidth,isingHeight))
 
     do j = 1, isingHeight
@@ -113,7 +117,7 @@ contains
       print *, 'ERROR: magnetic spin at position', i, j, 'is not equal to 1 or -1'
     end if
 
-    print *, 'Current spin is: ', spinSi
+    !print *, 'Current spin is: ', spinSi
   end subroutine
 
   subroutine SumNeighbourSpin
@@ -144,11 +148,11 @@ contains
       neighbour4 = isingGrid(i-1,j)
     end if
 
-    print *, 'neighbour spins are: ' , neighbour1, neighbour2, neighbour3, neighbour4
+    !print *, 'neighbour spins are: ' , neighbour1, neighbour2, neighbour3, neighbour4
 
     neighbourSum = neighbour1 + neighbour2 + neighbour3 + neighbour4
 
-    print *,'neighbour sum is: ' , neighbourSum
+    !print *,'neighbour sum is: ' , neighbourSum
   end subroutine
 
   subroutine CheckNeighbourSum
@@ -166,7 +170,7 @@ contains
       downSpins = 4
     end if
 
-    print *, 'number of down spins is: ', downSpins
+    !print *, 'number of down spins is: ', downSpins
 
   end subroutine
 
@@ -185,7 +189,7 @@ contains
       neighbourSum = -4
     end if
 
-    print *, 'Neighbour sum is : ', neighbourSum
+    !print *, 'Neighbour sum is : ', neighbourSum
   end subroutine
 
   subroutine PreCalcProbs
@@ -193,12 +197,12 @@ contains
     do downSpins = 0, 4
       if (spinSi == 1) then
         call CheckDownSpins
-        probArray(downSpins,1) = Probability(spinSi)
-        print *, neighbourSum
+        probArray(downSpins,1) = Probability(spinSi,neighbourSum,temp)
+        !print *, neighbourSum
       else if (spinSi == -1) then
         call CheckDownSpins
-        probArray(downSpins,2) = Probability(spinSi)
-        print *, neighbourSum
+        probArray(downSpins,2) = Probability(spinSi,neighbourSum,temp)
+        !print *, neighbourSum
       end if
     end do
   end subroutine
@@ -211,7 +215,7 @@ contains
       probValue = probArray(downSpins,2)
     end if
 
-    print *, 'Prob value: ', probValue
+    !print *, 'Prob value: ', probValue
   end subroutine
 
   subroutine FlipSpin
@@ -223,16 +227,16 @@ contains
     if (r.LT.probValue) then
       spinSi = spinSi * (-1)
       flipAllowed = .True.
-      print *, 'Flip allowed'
+      !print *, 'Flip allowed'
     else
       spinSi = spinSi
       flipAllowed = .False.
-      print *, 'Flip not allowed'
+      !print *, 'Flip not allowed'
     end if
 
-    print *, 'New Si value: ', spinSi
+    !print *, 'New Si value: ', spinSi
 
-    print *, isingGrid
+    !print *, isingGrid
   end subroutine
 
   subroutine UpdateIsingGrid
@@ -241,7 +245,7 @@ contains
       isingGrid(i,j) = spinSi
     end if
 
-    print *, isingGrid
+    !print *, isingGrid
   end subroutine
 
   subroutine SumLatticeSpins
@@ -252,6 +256,10 @@ contains
   subroutine AssignMagData
     !!! Assigns values of Magnetisation to magData array for each time step !!!
     magData(timestep) = Magnetisation(sumSi)
+
+    open(unit=1, file='magdata.dat')
+
+    write(1,*) timestep, magData(timestep)
   end subroutine
 
 end program ising
