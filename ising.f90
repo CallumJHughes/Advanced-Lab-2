@@ -5,7 +5,7 @@ program ising
 !********************************************************************
 !************************* DEFINING OBJECTS *************************
 !********************************************************************
-  !!! Deines constants !!!
+  !!! Defines constants !!!
   real (kind=dp), parameter :: kB = 1.38064852E-23
   real (kind=dp), parameter :: h = 0.01
 
@@ -17,9 +17,6 @@ program ising
   real (kind=dp) :: temp
   integer :: isingWidth, isingHeight, i, j, spinSi, downSpins
   integer :: neighbour1, neighbour2, neighbour3, neighbour4, neighbourSum
-
-  !!! Deines the functions names and types !!!
-  !real (kind=dp) :: Probability, Energy
 
 !********************************************************************
 !************************** MAIN PROGRAMME **************************
@@ -33,7 +30,6 @@ program ising
   call PreCalcProbs
 
   print *, probArray
-
 
   call CreateIsingGrid
   isingGrid(2,1) = -1
@@ -155,8 +151,6 @@ contains
 
   subroutine PreCalcProbs
     !!! Subroutine to precalculate the probabilities of flipping spin !!!
-    !integer :: d
-
     do downSpins = 0, 4
       if (spinSi == 1) then
         call CheckDownSpins
@@ -168,16 +162,15 @@ contains
         print *, neighbourSum
       end if
     end do
-
   end subroutine
 end program ising
 
 !!!!!!!!!!!!!
 !!! NOTES !!!
 !!!!!!!!!!!!!
-! – Maybe move allocation of isingGrid to subroutine CreateIsingGrid (call CreateIsingGrid be removed from nested loop in
-!   main programme)
-! - Remember to remove all print statements in each subroutine used for testing
+! – Maybe move allocation of isingGrid to subroutine CreateIsingGrid (call CreateIsingGrid be removed from nested
+!   loop in main programme)
+! – Remember to remove all print statements in each subroutine used for testing
 ! – IOSTAT=err for input and what not
 ! – Will kB be used in Probability function?
 ! – When all neighbour flips are up, the probability of changing to flip down is very high
