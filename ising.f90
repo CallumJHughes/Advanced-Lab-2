@@ -12,18 +12,21 @@ program ising
   !!! Defines arrays !!!
   real (kind=dp), dimension(0:4,2) :: probArray
   integer, dimension(:,:), allocatable :: isingGrid
+  real (kind=dp), dimension(:), allocatable :: magData
 
   !!! Defines variables
   real (kind=dp) :: temp, probValue
-  integer :: isingWidth, isingHeight, i, j, spinSi, downSpins
-  integer :: neighbour1, neighbour2, neighbour3, neighbour4, neighbourSum
+  integer :: isingWidth, isingHeight, i, j, t, spinSi, downSpins, numTimeSteps
+  integer :: neighbour1, neighbour2, neighbour3, neighbour4, neighbourSum, sumSi
   logical :: flipAllowed
 
 !********************************************************************
 !************************** MAIN PROGRAMME **************************
 !********************************************************************
 
-  temp = 20
+  numTimeSteps = 20
+  allocate(magData(numTimeSteps))
+  temp = 10
 
   ! Precalculate the probability array
   spinSi = 1
@@ -40,17 +43,24 @@ program ising
   !isingGrid(2,3) = -1
   print *, isingGrid
 
-  do j = 1, isingHeight
-    do i = 1, isingWidth
-      call CheckSpin
-      call SumNeighbourSpin
-      call CheckNeighbourSum
-      call FindProbability
-      call FlipSpin
-      call UpdateIsingGrid
-      print *, ' '
+  do t = 1, numTimeSteps
+    sumSi = 0 ! Resets the sum of the spins of lattice points of the system
+    do j = 1, isingHeight
+      do i = 1, isingWidth
+        call CheckSpin
+        call SumNeighbourSpin
+        call CheckNeighbourSum
+        call FindProbability
+        call FlipSpin
+        call UpdateIsingGrid
+        call SumLatticeSpins
+        print *, ' ' ! Creates gap between output statements for each step
+      end do
     end do
+    call AssignMagData
   end do
+
+  print *, magData
 
 !********************************************************************
 !******************** FUNCTIONS AND SUBROUTINES *********************
@@ -58,20 +68,27 @@ program ising
 contains
   function Energy(Si)
     !!! Function to calculate Energy of state at current lattice point !!!
-    real(kind=dp) :: Energy
+    real (kind=dp) :: Energy
     integer :: Si
-    real(kind=dp), parameter :: J = 1
-    real(kind=dp), parameter :: h = 0.01
+    real (kind=dp), parameter :: h = 0.01
 
     Energy = -(Si*neighbourSum)-(h*Si)
   end function Energy
 
   function Probability(Si)
     !!! Function to calculate probability of spin flip using Energy function !!!
-    real(kind=dp) :: Probability
+    real (kind=dp) :: Probability
     integer :: Si
 
     Probability = exp(-(Energy(Si*(-1))-Energy(Si))/temp)
+  end function
+
+  function Magnetisation(sumSi)
+    !!! Function to calculate the Magnetisation of the system !!!
+    real (kind=dp) :: Magnetisation
+    integer :: sumSi
+
+    Magnetisation = (1.0/(isingWidth*isingHeight))*(sumSi)
   end function
 
   subroutine CreateIsingGrid
@@ -200,7 +217,7 @@ contains
 
   subroutine FlipSpin
     !!! Subroutine to check if a random number is less than the probability, if so allow flip !!!
-    real(kind=dp) :: r
+    real (kind=dp) :: r
 
     call Random_Number(r)
 
@@ -228,6 +245,16 @@ contains
     print *, isingGrid
   end subroutine
 
+  subroutine SumLatticeSpins
+    !!! Subroutine to sum the spins of all the lattice points in the system
+    sumSi = sumSi + isingGrid(i,j)
+  end subroutine
+
+  subroutine AssignMagData
+    !!! Assigns values of Magnetisation to magData array for each time step !!!
+    magData(t) = Magnetisation(sumSi)
+  end subroutine
+
 end program ising
 
 !!!!!!!!!!!!!
@@ -236,4 +263,4 @@ end program ising
 ! – Remember to remove all print statements in each subroutine used for testing
 ! – IOSTAT=err for input and what not
 ! – When all neighbour flips are up, the probability of changing to flip down is very high
-! – Add code for user to choose lattice size
+! – Add code for user to choose lattice size and number of time steps?
