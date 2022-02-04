@@ -264,3 +264,4 @@ end program ising
 ! – IOSTAT=err for input and what not
 ! – When all neighbour flips are up, the probability of changing to flip down is very high
 ! – Add code for user to choose lattice size and number of time steps?
+! – Add code to AssignMagData subroutine to write out to mag data and time steps to a data file
