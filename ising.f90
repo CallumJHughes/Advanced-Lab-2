@@ -6,7 +6,7 @@ program ising
 !************************* DEFINING OBJECTS *************************
 !********************************************************************
   !!! Defines constants !!!
-  real (kind=dp), parameter :: kB = 1.38064852E-23
+  !real (kind=dp), parameter :: kB = 1
   real (kind=dp), parameter :: h = 0.01
 
   !!! Defines arrays !!!
@@ -29,7 +29,7 @@ program ising
   spinSi = -1
   call PreCalcProbs
 
-  print *, probArray
+  !print *, probArray
 
   call CreateIsingGrid
   isingGrid(2,1) = -1
@@ -37,6 +37,8 @@ program ising
   isingGrid(3,2) = -1
   isingGrid(2,3) = -1
   print *, isingGrid
+
+  
 
   !do j = 1, isingHeight
     !do i = 1, isingWidth
@@ -162,6 +164,21 @@ contains
         print *, neighbourSum
       end if
     end do
+  end subroutine
+
+  subroutine FlipSpin
+    !!! Subroutine to check if a random number is less than the probability, if so allow flip !!!
+    real(kind=dp) :: r
+
+    call Random_Number(r)
+
+    if (r.LT.Probability(spinSi)) then
+      spinSi = spinSi * (-1)
+    else
+      spinSi = spinSi
+    end if
+
+    print *, isingGrid
   end subroutine
 end program ising
 
