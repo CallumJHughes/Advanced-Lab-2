@@ -16,7 +16,7 @@ program ising
 
   !!! Defines variables
   real (kind=dp) :: temp, probValue
-  integer :: isingWidth, isingHeight, i, j, t, spinSi, downSpins, numTimeSteps
+  integer :: isingWidth, isingHeight, i, j, timestep, spinSi, downSpins, numTimeSteps
   integer :: neighbour1, neighbour2, neighbour3, neighbour4, neighbourSum, sumSi
   logical :: flipAllowed
 
@@ -40,10 +40,9 @@ program ising
   isingGrid(1,1) = -1
   isingGrid(2,1) = -1
   isingGrid(3,1) = -1
-  !isingGrid(2,3) = -1
   print *, isingGrid
 
-  do t = 1, numTimeSteps
+  do timestep = 1, numTimeSteps
     sumSi = 0 ! Resets the sum of the spins of lattice points of the system
     do j = 1, isingHeight
       do i = 1, isingWidth
@@ -252,7 +251,7 @@ contains
 
   subroutine AssignMagData
     !!! Assigns values of Magnetisation to magData array for each time step !!!
-    magData(t) = Magnetisation(sumSi)
+    magData(timestep) = Magnetisation(sumSi)
   end subroutine
 
 end program ising
@@ -267,3 +266,4 @@ end program ising
 ! – Add code to AssignMagData subroutine to write out to mag data and time steps to a data file
 ! – Add subroutine for garbage collection
 ! – Add graph for Magnetisation vs Temp and include reference
+! – Calculating total lattice energy???
