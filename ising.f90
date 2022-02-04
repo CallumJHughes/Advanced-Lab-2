@@ -265,3 +265,5 @@ end program ising
 ! – When all neighbour flips are up, the probability of changing to flip down is very high
 ! – Add code for user to choose lattice size and number of time steps?
 ! – Add code to AssignMagData subroutine to write out to mag data and time steps to a data file
+! – Add subroutine for garbage collection
+! – Add graph for Magnetisation vs Temp and include reference
