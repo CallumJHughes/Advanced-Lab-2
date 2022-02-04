@@ -14,16 +14,18 @@ program ising
   integer, dimension(:,:), allocatable :: isingGrid
 
   !!! Defines variables
-  real (kind=dp) :: temp
+  real (kind=dp) :: temp, probValue
   integer :: isingWidth, isingHeight, i, j, spinSi, downSpins
   integer :: neighbour1, neighbour2, neighbour3, neighbour4, neighbourSum
+  logical :: flipAllowed
 
 !********************************************************************
 !************************** MAIN PROGRAMME **************************
 !********************************************************************
 
-  temp = 3
+  temp = 20
 
+  ! Precalculate the probability array
   spinSi = 1
   call PreCalcProbs
   spinSi = -1
@@ -32,26 +34,23 @@ program ising
   !print *, probArray
 
   call CreateIsingGrid
+  isingGrid(1,1) = -1
   isingGrid(2,1) = -1
-  isingGrid(1,2) = -1
-  isingGrid(3,2) = -1
-  isingGrid(2,3) = -1
+  isingGrid(3,1) = -1
+  !isingGrid(2,3) = -1
   print *, isingGrid
 
-  
-
-  !do j = 1, isingHeight
-    !do i = 1, isingWidth
-      !call CheckSpin
-      !print *, 'Current spin is: ' ,spinSi
-      !call SumNeighbourSpin
-      !call CheckDownSpins
-      !print *, 'energy is: ', Energy(spinSi)
-      !print *, 'probability is: ', Probability(spinSi)
-      !call PreCalcProbs
-      !print *, ' '
-    !end do
-  !xend do
+  do j = 1, isingHeight
+    do i = 1, isingWidth
+      call CheckSpin
+      call SumNeighbourSpin
+      call CheckNeighbourSum
+      call FindProbability
+      call FlipSpin
+      call UpdateIsingGrid
+      print *, ' '
+    end do
+  end do
 
 !********************************************************************
 !******************** FUNCTIONS AND SUBROUTINES *********************
@@ -97,6 +96,8 @@ contains
     else
       print *, 'ERROR: magnetic spin at position', i, j, 'is not equal to 1 or -1'
     end if
+
+    print *, 'Current spin is: ', spinSi
   end subroutine
 
   subroutine SumNeighbourSpin
@@ -134,8 +135,28 @@ contains
     print *,'neighbour sum is: ' , neighbourSum
   end subroutine
 
+  subroutine CheckNeighbourSum
+    !!! Subroutine to check the neighbour sum and assign relevant number of down spins !!!
+    !!! Used to in main programme !!!
+    if (neighbourSum.EQ.4) then
+      downSpins = 0
+    else if (neighbourSum.EQ.2) then
+      downSpins = 1
+    else if (neighbourSum.EQ.0) then
+      downSpins = 2
+    else if (neighbourSum.EQ.-2) then
+      downSpins = 3
+    else if (neighbourSum.EQ.-4) then
+      downSpins = 4
+    end if
+
+    print *, 'number of down spins is: ', downSpins
+
+  end subroutine
+
   subroutine CheckDownSpins
-    !!! Subroutine to check the number of down spins in the set of neighbours !!!
+    !!! Subroutine to check the number of down spin neighbours and assign relavant neighbour sum !!!
+    !!! Used to precalculate the probability array !!!
     if (downSpins.EQ.0) then
       neighbourSum = 4
     else if (downSpins.EQ.1) then
@@ -145,10 +166,10 @@ contains
     else if (downSpins.EQ.3) then
       neighbourSum = -2
     else if (downSpins.EQ.4) then
-      neighboursum = -4
+      neighbourSum = -4
     end if
 
-    !print *, 'number of down spins is: ', downSpins
+    print *, 'Neighbour sum is : ', neighbourSum
   end subroutine
 
   subroutine PreCalcProbs
@@ -166,20 +187,47 @@ contains
     end do
   end subroutine
 
+  subroutine FindProbability
+    !!! Subroutine to find the relavant probability value in the probability array !!!
+    if (spinSi == 1) then
+      probValue = probArray(downSpins,1)
+    else if (spinSi == -1) then
+      probValue = probArray(downSpins,2)
+    end if
+
+    print *, 'Prob value: ', probValue
+  end subroutine
+
   subroutine FlipSpin
     !!! Subroutine to check if a random number is less than the probability, if so allow flip !!!
     real(kind=dp) :: r
 
     call Random_Number(r)
 
-    if (r.LT.Probability(spinSi)) then
+    if (r.LT.probValue) then
       spinSi = spinSi * (-1)
+      flipAllowed = .True.
+      print *, 'Flip allowed'
     else
       spinSi = spinSi
+      flipAllowed = .False.
+      print *, 'Flip not allowed'
+    end if
+
+    print *, 'New Si value: ', spinSi
+
+    print *, isingGrid
+  end subroutine
+
+  subroutine UpdateIsingGrid
+    !!! Subroutine to update the Ising grid if the spin flip was allowed !!!
+    if (flipAllowed .eqv. .True.) then
+      isingGrid(i,j) = spinSi
     end if
 
     print *, isingGrid
   end subroutine
+
 end program ising
 
 !!!!!!!!!!!!!
