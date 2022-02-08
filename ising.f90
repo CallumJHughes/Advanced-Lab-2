@@ -27,7 +27,7 @@ program ising
   numTimeSteps = 1000
   allocate(magData(numTimeSteps))
   allocate(energyData(numTimeSteps))
-  temp = 1
+  temp = 3
 
   ! Precalculate the probability array
   spinSi = 1
@@ -45,7 +45,7 @@ program ising
   timestep=0
   sumSi=0
   call SumLatticeSpins
-  print *, sumSi
+  !print *, sumSi
   call AssignMagData
 
   do timestep = 1, numTimeSteps
@@ -64,16 +64,17 @@ program ising
         call FindProbability
         call FlipSpin
         call UpdateIsingGrid
-        !call StateEnergy
+        call TotalEnergy
         !print *, ' ' ! Creates gap between output statements for each step
       end do
     end do
     call SumLatticeSpins
     call AssignMagData
+    call AssignEnergyData
     !print *, 'total lattice energy is: ', totalLatticeEnergy
   end do
 
-  print *, isingGrid
+  print *, 'Final Ising Grid: ', isingGrid
 
   !print *, magData
 
@@ -83,9 +84,9 @@ program ising
 
   print *, 'Mag Avg is: ', magAvg
 
-  !call EnergyDataAvg
+  call EnergyDataAvg
 
-  !print *, 'Energy Avg is: ', energyAvg
+  print *, 'Energy Avg is: ', energyAvg
 
 !********************************************************************
 !******************** FUNCTIONS AND SUBROUTINES *********************
@@ -96,7 +97,7 @@ contains
     real (kind=dp) :: Energy
     integer :: Si, neighbours
     real (kind=dp), parameter :: J = 1.0
-    real (kind=dp), parameter :: h = -0.01
+    real (kind=dp), parameter :: h = 0.01
 
     Energy = -(J*Si*neighbours)-(h*Si)
   end function Energy
@@ -119,8 +120,8 @@ contains
 
   subroutine CreateIsingGrid
     !!! Subroutine to create the Ising Grid system of lattice points, each with a magnetic spin of 1 !!!
-    isingWidth = 6
-    isingHeight = 6
+    isingWidth = 20
+    isingHeight = 20
     allocate(isingGrid(isingWidth,isingHeight))
 
     do j = 1, isingHeight
@@ -247,8 +248,6 @@ contains
 
     call Random_Number(r)
 
-    print *, 'Random number is: ', r
-
     if (r.LT.probValue) then
       spinSi = spinSi * (-1)
       flipAllowed = .True.
@@ -311,14 +310,14 @@ contains
     !!! Writes energy values alongside current timestep out to a data file !!!
     energyData(timestep) = totalLatticeEnergy
 
-    print *, 'Energy is: ', energyData(timestep)
+    !print *, 'Energy is: ', energyData(timestep)
 
     open(unit=2, file='energydata.dat')
 
     write(2,*) timestep, energyData(timestep)
   end subroutine
 
-  subroutine StateEnergy
+  subroutine TotalEnergy
     !!! Calculates energy of state at current lattice point !!!
     totalLatticeEnergy = totalLatticeEnergy + Energy(spinSi,neighbourSum)
   end subroutine
@@ -340,12 +339,10 @@ end program ising
 !!!!!!!!!!!!!
 !!! NOTES !!!
 !!!!!!!!!!!!!
-! – Remember to remove all print statements in each subroutine used for testing
 ! – IOSTAT=err for input and what not
-! – When all neighbour flips are up, the probability of changing to flip down is very high
 ! – Add code for user to choose lattice size and number of time steps?
-! – Add code to AssignMagData subroutine to write out to mag data and time steps to a data file
 ! – Add subroutine for garbage collection
 ! – Add graph for Magnetisation vs Temp and include reference
-! – Calculating total lattice energy???
 ! – If add modules, functions and subroutines start with module name
+! – INCREASED GRID SIZE OTHERWISE FLUCTUATIONS CAUSE A  HUGE CHANGE I.E. WHOLE SYSTEM SLIPS IN MAGENTIC MOMENT
+! – Check mark scheme !!!
