@@ -50,14 +50,9 @@ program ising
 
   do timestep = 1, numTimeSteps
     sumSi = 0 ! Resets the sum of the spins of lattice points of the system
-    !call SumLatticeSpins
-    !print *, 'sum is: ', sumSi
-    !call AssignMagData
-    !call AssignEnergyData
     totalLatticeEnergy = 0
     do j = 1, isingHeight
       do i = 1, isingWidth
-        !print *, Magnetisation(sumSi,isingWidth,isingHeight)
         call CheckSpin
         call SumNeighbourSpin
         call CheckNeighbourSum
@@ -65,18 +60,15 @@ program ising
         call FlipSpin
         call UpdateIsingGrid
         call TotalEnergy
-        !print *, ' ' ! Creates gap between output statements for each step
       end do
     end do
     call SumLatticeSpins
     call AssignMagData
     call AssignEnergyData
-    !print *, 'total lattice energy is: ', totalLatticeEnergy
+    !print *, 'total lattice energy is: ', totalLatticeEnergy	
   end do
 
   print *, 'Final Ising Grid: ', isingGrid
-
-  !print *, magData
 
   print *, probArray
 
