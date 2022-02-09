@@ -24,10 +24,13 @@ program ising
 !************************** MAIN PROGRAMME **************************
 !********************************************************************
 
+  ! Assigns variables used in programme
   numTimeSteps = 1000
+  temp = 3
+
+  ! Allocates sizes of data arrays to hold same number of data points as value of numTimeSteps
   allocate(magData(numTimeSteps))
   allocate(energyData(numTimeSteps))
-  temp = 3
 
   ! Precalculate the probability array
   spinSi = 1
@@ -35,19 +38,17 @@ program ising
   spinSi = -1
   call PreCalcProbs
 
+  ! Creates the initial Ising grid
   call CreateIsingGrid
-  !isingGrid(3,4) = -1
-  !isingGrid(1,5) = -1
-  !isingGrid(5,3) = -1
-  !isingGrid(3,4) = -1
-  print *, 'initial ising: ', isingGrid
+  print *, 'initial Ising grid: ', isingGrid
 
+  ! Calulates magnetisation at time=0 (Should be one)
   timestep=0
   sumSi=0
   call SumLatticeSpins
-  !print *, sumSi
   call AssignMagData
 
+  ! Monte Carlo algorithm across a set amount of time
   do timestep = 1, numTimeSteps
     sumSi = 0 ! Resets the sum of the spins of lattice points of the system
     totalLatticeEnergy = 0
@@ -65,19 +66,15 @@ program ising
     call SumLatticeSpins
     call AssignMagData
     call AssignEnergyData
-    !print *, 'total lattice energy is: ', totalLatticeEnergy	
+    !print *, 'total lattice energy is: ', totalLatticeEnergy
   end do
 
+  ! Data printing to standard output and manipulation
   print *, 'Final Ising Grid: ', isingGrid
-
   print *, probArray
-
   call MagDataAvg
-
   print *, 'Mag Avg is: ', magAvg
-
   call EnergyDataAvg
-
   print *, 'Energy Avg is: ', energyAvg
 
 !********************************************************************
