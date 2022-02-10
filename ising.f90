@@ -5,16 +5,13 @@ program ising
 !********************************************************************
 !************************* DEFINING OBJECTS *************************
 !********************************************************************
-  !!! Defines constants !!!
-  !real (kind=dp), parameter :: kB = 1
-  !real (kind=dp), parameter :: h = 0.01
 
   !!! Defines arrays !!!
   real (kind=dp), dimension(0:4,2) :: probArray
   integer, dimension(:,:), allocatable :: isingGrid
   real (kind=dp), dimension(:), allocatable :: magData, energyData
 
-  !!! Defines variables
+  !!! Defines variables !!!
   real (kind=dp) ::  probValue, magAvg, energyAvg, totalLatticeEnergy
   integer :: isingWidth, isingHeight, i, j, timestep, spinSi, downSpins, numTimeSteps, temp
   integer :: neighbour1, neighbour2, neighbour3, neighbour4, neighbourSum, sumSi
@@ -294,8 +291,14 @@ contains
     magAvg = magTot / size(magData)
   end subroutine
 
+  subroutine TotalEnergy
+    !!! Calculates energy of state at current lattice point !!!
+    totalLatticeEnergy = totalLatticeEnergy + Energy(spinSi,neighbourSum)
+  end subroutine
+
   subroutine AssignEnergyData
-    !!! Calculates Energy of each lattice point and sums them to find Total Lattice Energy, then assigns values to energyData array for each time step !!!
+    !!! Calculates Energy of each lattice point and sums them to find Total Lattice Energy !!!
+    !!! Assigns values to energyData array for each time step !!!
     !!! Writes energy values alongside current timestep out to a data file !!!
     energyData(timestep) = totalLatticeEnergy
 
@@ -304,11 +307,6 @@ contains
     open(unit=2, file='energydata.dat')
 
     write(2,*) timestep, energyData(timestep)
-  end subroutine
-
-  subroutine TotalEnergy
-    !!! Calculates energy of state at current lattice point !!!
-    totalLatticeEnergy = totalLatticeEnergy + Energy(spinSi,neighbourSum)
   end subroutine
 
   subroutine EnergyDataAvg
